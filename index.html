@@ -6,24 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Facebook project login</title>
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-    <script>
-      window.fbAsyncInit = function() {
-          FB.init({
-              appId      : '994007258933295',
-              cookie     : true,
-              xfbml      : true,
-              version    : 'v14.0' // Use the latest version
-          });
-      };
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '994007258933295',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v12.0'
+    });
 
-      (function(d, s, id){
-          var js, fjs = d.getElementsByTagName(s)[0];
-          if (d.getElementById(id)) {return;}
-          js = d.createElement(s); js.id = id;
-          js.src = "https://connect.facebook.net/en_US/sdk.js";
-          fjs.parentNode.insertBefore(js, fjs);
-      }(document, 'script', 'facebook-jssdk'));
-  </script>
+    FB.AppEvents.logPageView();   
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
   </head>
   <body>
     <div id="root"></div>
