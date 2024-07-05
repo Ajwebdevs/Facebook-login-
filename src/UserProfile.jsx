@@ -1,5 +1,5 @@
 import React from 'react';
-
+//fetch profile
 const UserProfile = ({ user }) => {
     if (!user) return null;
     

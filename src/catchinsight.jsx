@@ -1,43 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 
-const PageInsights = ({ user, selectedPage }) => {
-    const [insights, setInsights] = useState({});
-
-    useEffect(() => {
-        const fetchInsights = async () => {
-            if (!selectedPage || !user.accessToken) return;
-            try {
-                const response = await axios.get(`https://graph.facebook.com/${selectedPage}/insights`, {
-                    params: {
-                        access_token: user.accessToken,
-                        metric: 'page_fans,page_engaged_users,page_impressions,page_actions_post_reactions_total',
-                        since: '2024-01-01', 
-                        until: '2024-07-01', 
-                        period: 'total_over_range'
-                    }
-                });
-                setInsights(response.data.data);
-            } catch (error) {
-                console.error('Error fetching insights:', error);
-            }
-        };
-
-        fetchInsights();
-    }, [selectedPage, user.accessToken]);
+const PageInsights = ({ insights }) => {
+    const getMetricValue = (metricName) => {
+        const metric = insights.find((insight) => insight.name === metricName);
+        return metric ? metric.values.reduce((acc, value) => acc + value.value, 0) : 0;
+    };
 
     return (
         <div>
-            {insights.length > 0 ? (
-                insights.map((insight) => (
-                    <div key={insight.name}>
-                        <h3>{insight.title}</h3>
-                        <p>{insight.values[0].value}</p>
-                    </div>
-                ))
-            ) : (
-                <p>No insights available</p>
-            )}
+            <h3>Page Insights</h3>
+            <div>
+                <h4>Total Followers / Fans</h4>
+                <p>{getMetricValue('page_fans')}</p>
+            </div>
+            <div>
+                <h4>Total Engagement</h4>
+                <p>{getMetricValue('page_engaged_users')}</p>
+            </div>
+            <div>
+                <h4>Total Impressions</h4>
+                <p>{getMetricValue('page_impressions')}</p>
+            </div>
+            <div>
+                <h4>Total Reactions</h4>
+                <p>{getMetricValue('page_reactions')}</p>
+            </div>
         </div>
     );
 };

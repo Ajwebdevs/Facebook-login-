@@ -19,6 +19,8 @@ const FacebookLoginButton = ({ setUser }) => {
     }(document, 'script', 'facebook-jssdk'));
   }, []);
 
+
+  //handel login funcation => excutes when tbtn called
   const handleLogin = () => {
     FB.login((response) => {
       if (response.authResponse) {

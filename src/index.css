@@ -13,6 +13,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.select {
+  size: 100px;
+  color: black;
+  text-align: center;
+  text-decoration: solid;
+  padding: 15px;
+  border-radius: 30px;
+  background-color: #d3d4d7;
+  border: none;
+}
 a {
   font-weight: 500;
   color: #646cff;
