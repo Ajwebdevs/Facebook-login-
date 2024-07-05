@@ -39,7 +39,7 @@ const FacebookLoginButton = ({ setUser }) => {
         version: 'v14.0'
       });
     };
-
+//new version
     (function (d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) { return; }
