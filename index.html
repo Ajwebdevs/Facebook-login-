@@ -4,127 +4,192 @@
   <title>Facebook Login</title>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="/src/App.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    h3 {
+      margin: 20px 0;
+      font-size: 1.2em;
+      color: #333;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: block;
+    }
+    .insights {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .insight-item {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      display: block;
+    }
+    .insight-item span {
+      font-weight: bold;
+      color: #333;
+    }
+    #profile-photo {
+      border-radius: 50%;
+      margin-top: 20px;
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+    }
+  </style>
 </head>
 <body>
-<script>
-  // This is called with the results from FB.getLoginStatus().
-  function statusChangeCallback(response) {
-    console.log('statusChangeCallback');
-    console.log(response);  // The current login status of the person.
-    if (response.status === 'connected') {
-      testAPI();  
-    } else {
-      document.getElementById('status').innerHTML = 'Please log ' +
-        'into this webpage.';
-    }
-  }
+<div class="container">
+  <script>
+    // Initialize the Facebook SDK
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '994007258933295', 
+        cookie     : true,       
+        xfbml      : true,       
+        version    : 'v20.0'     
+      });
 
-  // This function is called when someone finishes with the Login Button.
-  function checkLoginState() {
-    FB.getLoginStatus(function(response) {
-      statusChangeCallback(response);
-    });
-  }
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+    };
 
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '994007258933295', 
-      cookie     : true,       
-      xfbml      : true,       
-      version    : 'v20.0'     
-    });
+    // Load the SDK asynchronously
+    (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
 
-    FB.getLoginStatus(function(response) {
-      statusChangeCallback(response);
-    });
-  };
-
-  // Load the SDK asynchronously
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "https://connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-
-  function testAPI() {
-    console.log('Welcome! Fetching your information.... ');
-    FB.api('/me', function(response) {
-      console.log('Successful login for: ' + response.name);
-      document.getElementById('status').innerHTML =
-        'Thanks for logging in, ' + response.name + '!';
-    });
-
-    // Fetch the pages owned by the user
-    FB.api('/me/accounts', function(response) {
-      console.log('Pages:', response);
-      if (response && !response.error) {
-        const pages = response.data;
-        let options = '<option value="">Select a page</option>';
-        pages.forEach(page => {
-          options += `<option value="${page.id}">${page.name}</option>`;
-        });
-        document.getElementById('pages').innerHTML = options;
+    // Callback for login status changes
+    function statusChangeCallback(response) {
+      if (response.status === 'connected') {
+        testAPI();  
       } else {
-        console.error('Error fetching pages:', response.error);
+        document.getElementById('status').innerHTML = 'Please log into this webpage.';
       }
-    });
-  }
+    }
 
-  // Function to fetch page insights
-  function fetchPageInsights() {
-    const pageId = document.getElementById('pages').value;
-    if (!pageId) return;
+    // Check login state and handle login
+    function checkLoginState() {
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+    }
 
-    // Fetch page access token
-    FB.api(`/me/accounts`, function(response) {
-      const page = response.data.find(p => p.id === pageId);
-      const accessToken = page.access_token;
+    // Test the API after successful login
+    function testAPI() {
+      FB.api('/me', function(response) {
+        console.log('Successful login for: ' + response.name);
+        document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.name + '!';
 
-      // Fetch page insights
-      FB.api(`/${pageId}/insights`, {
-        metric: 'page_fans,page_engaged_users,page_impressions,page_reactions_by_page',
-        period: 'day',
-        access_token: accessToken
-      }, function(response) {
-        console.log('Page Insights:', response);
-        if (response && !response.error) {
-          const insights = response.data;
-          const findInsight = name => {
-            const insight = insights.find(insight => insight.name === name);
-            return insight ? insight.values[0].value : 'N/A';
-          };
-          document.getElementById('followers').innerText = findInsight('page_fans');
-          document.getElementById('engagement').innerText = findInsight('page_engaged_users');
-          document.getElementById('impressions').innerText = findInsight('page_impressions');
-          document.getElementById('reactions').innerText = findInsight('page_reactions_by_page');
+        // Fetch profile picture
+        FB.api('/me/picture?redirect=false', function(pictureResponse) {
+          if (pictureResponse && !pictureResponse.error) {
+            document.getElementById('profile-photo').src = pictureResponse.data.url;
+          } else {
+            console.error('Error fetching profile picture:', pictureResponse.error);
+          }
+        });
+
+        // Fetch the pages owned by the user
+        FB.api('/me/accounts', function(response) {
+          if (response && !response.error) {
+            const pages = response.data;
+            let options = '<option value="">Select a page</option>';
+            pages.forEach(page => {
+              options += `<option value="${page.id}">${page.name}</option>`;
+            });
+            document.getElementById('pages').innerHTML = options;
+          } else {
+            console.error('Error fetching pages:', response.error);
+          }
+        });
+      });
+    }
+
+    // Fetch page insights
+    function fetchPageInsights() {
+      const pageId = document.getElementById('pages').value;
+      if (!pageId) return;
+
+      // Fetch page access token
+      FB.api('/me/accounts', function(response) {
+        const page = response.data.find(p => p.id === pageId);
+        if (page) {
+          const accessToken = page.access_token;
+
+          // Fetch page insights
+          FB.api(`/${pageId}/insights`, {
+            metric: 'page_engaged_users,page_impressions_unique,page_actions_post_reactions_like_total',
+            period: 'day',
+            access_token: accessToken
+          }, function(response) {
+            console.log('Insights response:', response);
+            if (response && !response.error) {
+              const insights = response.data;
+              const findInsight = (name) => {
+                const insight = insights.find(insight => insight.name === name);
+                return insight ? (insight.values[0]?.value || 'N/A') : 'N/A';
+              };
+              document.getElementById('engagement').innerText = findInsight('page_engaged_users');
+              document.getElementById('impressions').innerText = findInsight('page_impressions_unique');
+              document.getElementById('reactions').innerText = findInsight('page_actions_post_reactions_like_total');
+            } else {
+              console.error('Error fetching insights:', response.error);
+            }
+          });
         } else {
-          console.error('Error fetching insights:', response.error);
+          console.error('Page not found');
         }
       });
-    });
-  }
-</script>
+    }
+  </script>
 
-<!-- The JS SDK Login Button -->
-<fb:login-button 
-  scope="public_profile,pages_show_list,pages_read_engagement"
-  onlogin="checkLoginState();">
-</fb:login-button>
+  <!-- The JS SDK Login Button -->
+  <fb:login-button 
+    scope="public_profile,pages_show_list,pages_read_engagement,read_insights"
+    onlogin="checkLoginState();">
+  </fb:login-button>
 
-<div id="status"></div>
+  <div id="status"></div>
+  <img id="profile-photo" alt="Profile Photo" />
 
-<h3>Owned Pages</h3>
-<select id="pages" onchange="fetchPageInsights()">
-</select>
+  <h3>Owned Pages</h3>
+  <select id="pages" onchange="fetchPageInsights()"></select>
 
-<div>
-  <h3>Page Insights</h3>
-  <div>Total Followers: <span id="followers"></span></div>
-  <div>Total Engagement: <span id="engagement"></span></div>
-  <div>Total Impressions: <span id="impressions"></span></div>
-  <div>Total Reactions: <span id="reactions"></span></div>
+  <div class="insights">
+    <h3>Page Insights</h3>
+    <div class="insight-item">Total Engagement: <span id="engagement"></span></div>
+    <div class="insight-item">Total Impressions: <span id="impressions"></span></div>
+    <div class="insight-item">Total Reactions: <span id="reactions"></span></div>
+  </div>
 </div>
 
 <!-- Load the JS SDK asynchronously -->
