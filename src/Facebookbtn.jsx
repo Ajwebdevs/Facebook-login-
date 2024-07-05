@@ -4,7 +4,7 @@ const FacebookLoginButton = ({ setUser }) => {
   useEffect(() => {
     window.fbAsyncInit = function () {
       FB.init({
-        appId      : '1065509685190294',
+        appId      : '847627977269779',
         xfbml      : true,
         version    : 'v20.0'
       });
