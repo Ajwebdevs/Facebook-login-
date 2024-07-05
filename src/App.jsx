@@ -116,7 +116,7 @@ THE BUISNESS TYPE OF THE FACEBOOK API WOULDNT ALLOW THE APP TO BE WORKING ITS NO
 //trying with the post 
 import React, { useState } from 'react';
 import FacebookLoginButton from './Facebookbtn';
-import './App.css';
+import './index.css'; 
 
 const App = () => {
   const [user, setUser] = useState(null);
