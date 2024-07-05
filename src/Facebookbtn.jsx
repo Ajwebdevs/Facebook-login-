@@ -33,7 +33,7 @@ const FacebookLoginButton = ({ setUser }) => {
   useEffect(() => {
     window.fbAsyncInit = function () {
       FB.init({
-        appId: 'YOUR_APP_ID',
+        appId: '994007258933295',
         cookie: true,
         xfbml: true,
         version: 'v14.0'
