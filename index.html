@@ -1,31 +1,112 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Facebook project login</title>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Facebook Login </title>
+  <meta charset="UTF-8">
+</head>
+<body>
 <script>
+  // This is called with the results from FB.getLoginStatus().
+  function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);  // The current login status of the person.
+    if (response.status === 'connected') {
+      testAPI();  
+    } else {
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into this webpage.';
+    }
+  }
+
+  // This function is called when someone finishes with the Login Button.
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
   window.fbAsyncInit = function() {
     FB.init({
-      appId      : '847627977269779',
-      xfbml      : true,
-      version    : 'v20.0'
+      appId      : '994007258933295', 
+      cookie     : true,       
+      xfbml      : true,       
+      version    : 'v20.0'     
     });
-    FB.AppEvents.logPageView();
+
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
   };
 
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "https://connect.facebook.net/en_US/sdk.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  function testAPI() {
+    console.log('Welcome! Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+    });
+
+    // Fetch the pages owned by the user
+    FB.api('/me/accounts', function(response) {
+      console.log('Pages:', response);
+      if (response && !response.error) {
+        const pages = response.data;
+        let options = '';
+        pages.forEach(page => {
+          options += `<option value="${page.id}">${page.name}</option>`;
+        });
+        document.getElementById('pages').innerHTML = options;
+      }
+    });
+  }
+
+  // Function to fetch page insights
+  function fetchPageInsights() {
+    const pageId = document.getElementById('pages').value;
+    FB.api(`/${pageId}/insights`, { metric: 'page_fans,page_engaged_users,page_impressions,page_reactions', period: 'day' }, function(response) {
+      console.log('Page Insights:', response);
+      if (response && !response.error) {
+        const insights = response.data;
+        document.getElementById('followers').innerText = insights.find(insight => insight.name === 'page_fans').values[0].value;
+        document.getElementById('engagement').innerText = insights.find(insight => insight.name === 'page_engaged_users').values[0].value;
+        document.getElementById('impressions').innerText = insights.find(insight => insight.name === 'page_impressions').values[0].value;
+        document.getElementById('reactions').innerText = insights.find(insight => insight.name === 'page_reactions').values[0].value;
+      }
+    });
+  }
 </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<!-- The JS SDK Login Button -->
+<fb:login-button 
+  scope="public_profile,pages_show_list,pages_read_engagement"
+  onlogin="checkLoginState();">
+</fb:login-button>
+
+<div id="status"></div>
+
+<h3>Owned Pages</h3>
+<select id="pages" onchange="fetchPageInsights()">
+  <option value="">Select a page</option>
+</select>
+
+<div>
+  <h3>Page Insights</h3>
+  <div>Total Followers: <span id="followers"></span></div>
+  <div>Total Engagement: <span id="engagement"></span></div>
+  <div>Total Impressions: <span id="impressions"></span></div>
+  <div>Total Reactions: <span id="reactions"></span></div>
+</div>
+
+<!-- Load the JS SDK asynchronously -->
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+</body>
 </html>

@@ -1,45 +1,71 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const FacebookLoginButton = ({ setUser }) => {
+const FacebookLoginButton = ({ setUser, setPages }) => {
   useEffect(() => {
     window.fbAsyncInit = function () {
       FB.init({
-        appId      : '847627977269779',
-        xfbml      : true,
-        version    : 'v20.0'
+        appId: '994007258933295', 
+        cookie: true,
+        xfbml: true,
+        version: 'v20.0'
+      });
+
+      FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
       });
     };
-//new version
+
     (function (d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) { return; }
+      if (d.getElementById(id)) return;
       js = d.createElement(s); js.id = id;
       js.src = "https://connect.facebook.net/en_US/sdk.js";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
   }, []);
 
+  const statusChangeCallback = (response) => {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+      testAPI();
+    } else {
+      console.error('Please log into this webpage.');
+    }
+  };
 
-  //handel login funcation => excutes when tbtn called
-  const handleLogin = () => {
-    FB.login((response) => {
-      if (response.authResponse) {
-        const { accessToken } = response.authResponse;
-        FB.api('/me', { fields: 'name,picture' }, (userInfo) => {
-          setUser({
-            name: userInfo.name,
-            picture: userInfo.picture.data.url,
-            accessToken: accessToken,
-          });
-        });
-      } else {
-        console.error('User cancelled login or failed.');
+  const checkLoginState = () => {
+    FB.getLoginStatus(function (response) {
+      statusChangeCallback(response);
+    });
+  };
+
+  const testAPI = () => {
+    console.log('Fetching your information.... ');
+    FB.api('/me', function (response) {
+      console.log('Successful login for: ' + response.name);
+      setUser({
+        name: response.name,
+        picture: `https://graph.facebook.com/${response.id}/picture?type=large`
+      });
+    });
+
+    FB.api('/me/accounts', function (response) {
+      console.log('Pages:', response);
+      if (response && !response.error) {
+        setPages(response.data);
       }
-    }, { scope: 'public_profile' });
+    });
   };
 
   return (
-    <button onClick={handleLogin}>Login with Facebook</button>
+    <div>
+      <fb:login-button 
+        scope="public_profile,pages_show_list,pages_read_engagement"
+        onlogin={checkLoginState}>
+      </fb:login-button>
+      <div id="status"></div>
+    </div>
   );
 };
 
