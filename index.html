@@ -43,10 +43,11 @@
     .insight-item {
       margin-bottom: 10px;
       padding: 10px;
+      align-items: flex-start;
       border: 1px solid #ddd;
       border-radius: 4px;
       background-color: #f9f9f9;
-      display: block;
+      display: flex;
     }
     .insight-item span {
       font-weight: bold;
@@ -147,7 +148,7 @@
 
           // Fetch page insights
           FB.api(`/${pageId}/insights`, {
-            metric: 'page_engaged_users,page_impressions_unique,page_actions_post_reactions_like_total',
+            metric: 'page_post_engagements,page_actions_post_reactions_like_total,page_total_actions,page_follows',
             period: 'day',
             access_token: accessToken
           }, function(response) {
@@ -158,9 +159,10 @@
                 const insight = insights.find(insight => insight.name === name);
                 return insight ? (insight.values[0]?.value || 'N/A') : 'N/A';
               };
-              document.getElementById('engagement').innerText = findInsight('page_engaged_users');
-              document.getElementById('impressions').innerText = findInsight('page_impressions_unique');
+              document.getElementById('engagement').innerText = findInsight('page_post_engagements');
               document.getElementById('reactions').innerText = findInsight('page_actions_post_reactions_like_total');
+              document.getElementById('actions').innerText = findInsight('page_total_actions');
+              document.getElementById('pagefollows').innerText = findInsight('page_follows');
             } else {
               console.error('Error fetching insights:', response.error);
             }
@@ -177,18 +179,21 @@
     scope="public_profile,pages_show_list,pages_read_engagement,read_insights"
     onlogin="checkLoginState();">
   </fb:login-button>
-
+  <br><br>
   <div id="status"></div>
+  <br>
   <img id="profile-photo" alt="Profile Photo" />
 
   <h3>Owned Pages</h3>
   <select id="pages" onchange="fetchPageInsights()"></select>
 
-  <div class="insights">
+  <div class="">
     <h3>Page Insights</h3>
-    <div class="insight-item">Total Engagement: <span id="engagement"></span></div>
-    <div class="insight-item">Total Impressions: <span id="impressions"></span></div>
-    <div class="insight-item">Total Reactions: <span id="reactions"></span></div>
+    <br>
+    <div class="insight-item">Total Engagement: <span id="engagement"></span></div><br>
+    <div class="insight-item">Total Reactions: <span id="reactions"></span></div><br>
+    <div class="insight-item">Total Actions: <span id="actions"></span></div><br>
+    <div class="insight-item">Total Followers: <span id="pagefollows"></span></div><br>
   </div>
 </div>
 
